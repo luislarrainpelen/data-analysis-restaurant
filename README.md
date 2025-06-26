@@ -43,19 +43,19 @@ En esta carpeta se encuentra el informe o documento de análisis que resume los 
 Ejemplo: informe_analisis_restaurante.md, dashboard_ventas.png, analisis_clientes.ipynb
 
 
-Cómo Replicar el Proyecto
+## Cómo Replicar el Proyecto
 Para configurar y ejecutar este proyecto en tu entorno local, sigue estos pasos:
 
-## Clona el repositorio:
+### Clona el repositorio:
 ``` Bash
 git clone https://github.com/luislarrainpelen/data-analysis-restaurant.git
 cd data-analysis-restaurant
 ```
 
-## Configura tu base de datos SQL:
+### Configura tu base de datos SQL:
 Asegúrate de tener instalada y funcionando la versión de SQL que prefieras en local o también puedes utilizar una herramienta online como por ejemplo www.db-fiddle.com
 
-## Workflow
+### Workflow
 Ejecuta los scripts en la carpeta schema/ para crear la base de datos y las tablas.
 Ejecuta los scripts en la carpeta etl_scripts/ para cargar los datos.
 Explora las consultas:
