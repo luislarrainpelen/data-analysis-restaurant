@@ -48,8 +48,8 @@ Para configurar y ejecutar este proyecto en tu entorno local, sigue estos pasos:
 
 ## Clona el repositorio:
 ``` Bash
-git clone https://github.com/tu_usuario/nombre_del_proyecto_restaurante.git
-cd nombre_del_proyecto_restaurante
+git clone https://github.com/luislarrainpelen/data-analysis-restaurant.git
+cd data-analysis-restaurant
 ```
 
 ## Configura tu base de datos SQL:
