@@ -2,7 +2,8 @@
 
 # Proyecto: Análisis de Datos de Restaurante
 Bienvenido al repositorio del proyecto de análisis de datos de un restaurant! 
-Este proyecto tiene como objetivo explorar y extraer insights valiosos a partir de un conjunto de datos transaccionales y operativos de un restaurant. A través del análisis con SQL, busco identificar patrones de venta, optimizar la gestión de inventario y comprender el comportamiento del cliente. Todo con el objetivo de ofrecer recomendaciones basadas en datos para mejorar la eficiencia y la rentabilidad del negocio.
+Este proyecto es una adaptación personal del desafío de análisis de datos de restaurantes que forma parte del reto de 8 semanas de Danny Ma [https://8weeksqlchallenge.com/]. A partir del esquema y preguntas originales, desarrollé mi propia versión con mejoras, datos simulados y análisis adicionales para consolidar mis habilidades en SQL y análisis de datos. 
+El objetivo de este proyecto es explorar y extraer insights valiosos a partir de un conjunto de datos transaccionales y operativos de un restaurant. A través del análisis con SQL y visualizaciones, busco identificar patrones de venta, optimizar la gestión de inventario y comprender el comportamiento del cliente. Todo con el objetivo de ofrecer recomendaciones basadas en datos para mejorar la eficiencia y la rentabilidad del negocio.
 
 ## Contexto y Motivación
 En el competitivo mundo de la gastronomía, la toma de decisiones basada en datos es crucial. Este proyecto personal surge de la curiosidad por entender cómo la información contenida en las transacciones diarias de un restaurante puede transformarse en conocimiento accionable. Desde la popularidad de los platos hasta los horarios/fechas de mayor afluencia, pasando por la gestión de costos, cada dato es una oportunidad para optimizar las operaciones y mejorar la experiencia del cliente.
