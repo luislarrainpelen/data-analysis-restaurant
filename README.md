@@ -1,5 +1,4 @@
-# sql-project-restaurant
-
+# data-analysis-restaurant
 
 # Proyecto: Análisis de Datos de Restaurante
 Bienvenido al repositorio del proyecto de análisis de datos de un restaurant! 
@@ -15,10 +14,10 @@ En el competitivo mundo de la gastronomía, la toma de decisiones basada en dato
 - Evaluar la rentabilidad: Calcular márgenes de ganancia por plato o categoría.
 - Proponer recomendaciones: Ofrecer insights que ayuden al restaurante a tomar decisiones informadas sobre el menú, promociones y personal.
 
-## Tecnologías Utilizadas
-SQL (se especificará la versión: por ejemplo, PostgreSQL, MySQL, SQL Server, SQLite)
-[Opcional: Herramienta de visualización] (por ejemplo, Tableau, Power BI, Google Data Studio, Matplotlib/Seaborn si usas Python)
-[Opcional: Lenguaje de scripting para ETL] (por ejemplo, Python para procesamiento de datos o carga)
+## Herramientas Utilizadas
+- SQL (PostgreSQL v13)
+- [Opcional: Herramienta de visualización] (por ejemplo, Tableau, Power BI, Google Data Studio, Matplotlib/Seaborn si usas Python)
+- [Opcional: Lenguaje de scripting para ETL] (por ejemplo, Python para procesamiento de datos o carga)
 
 ## Estructura del Proyecto
 Este repositorio está organizado en las siguientes carpetas lógicas para facilitar la navegación y comprensión del proyecto:
@@ -42,9 +41,10 @@ Ejemplo: ventas_por_plato.sql, consumo_ingredientes_mensual.sql, clientes_frecue
 5. analysis/
 En esta carpeta se encuentra el informe o documento de análisis que resume los hallazgos clave, los insights obtenidos de las consultas SQL y las recomendaciones para el negocio. Puede ser un archivo Markdown, un Jupyter Notebook (si usaste Python para análisis o visualización), o un PDF/HTML generado. También se incluirán visualizaciones o dashboards relevantes aquí.
 Ejemplo: informe_analisis_restaurante.md, dashboard_ventas.png, analisis_clientes.ipynb
+
+
 Cómo Replicar el Proyecto
 Para configurar y ejecutar este proyecto en tu entorno local, sigue estos pasos:
-
 
 ## Clona el repositorio:
 ``` Bash
@@ -53,7 +53,7 @@ cd nombre_del_proyecto_restaurante
 ```
 
 ## Configura tu base de datos SQL:
-Asegúrate de tener [Tu versión de SQL] instalado y funcionando.
+Asegúrate de tener instalada y funcionando la versión de SQL que prefieras en local o también puedes utilizar una herramienta online como por ejemplo www.db-fiddle.com
 
 ## Workflow
 Ejecuta los scripts en la carpeta schema/ para crear la base de datos y las tablas.
