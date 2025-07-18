@@ -1,0 +1,288 @@
+## Mis Respuestas:
+
+### --- 1: What is the total amount each customer spent at the restaurant?
+``` PostgreSQL
+SELECT 
+    s.customer_id,
+    SUM(m.price) AS total_spent
+FROM sales s
+JOIN menu m ON s.product_id = m.product_id
+GROUP BY s.customer_id;
+```
+
+### --- 2: How many days has each customer visited the restaurant?
+``` PostgreSQL
+SELECT
+	s.customer_id,
+    COUNT(DISTINCT s.order_date) AS total_days
+FROM sales s
+GROUP BY s.customer_id
+ORDER BY total_days DESC
+```
+
+### --- 3: What was the first item from the menu purchased by each customer?
+``` PostgreSQL
+SELECT DISTINCT
+    s.customer_id,
+    m.product_name
+FROM sales s
+JOIN menu m ON s.product_id = m.product_id
+WHERE s.order_date = (
+    SELECT MIN(order_date) 
+    FROM sales s2 
+    WHERE s2.customer_id = s.customer_id
+)
+ORDER BY s.customer_id;
+
+```
+
+### --- 4. What is the most purchased item on the menu and how many times was it purchased by all customers?
+``` PostgreSQL
+SELECT
+	m.product_name,
+    COUNT(s.product_id) AS times_purchased
+FROM sales s
+JOIN menu m ON s.product_id = m.product_id
+GROUP BY m.product_name
+ORDER BY times_purchased DESC
+;
+```
+
+
+### --- 5. Which item was the most popular for each customer?
+``` PostgreSQL
+SELECT 
+    s.customer_id,
+    m.product_name,
+    COUNT(s.product_id) AS num_productos
+FROM sales s
+JOIN menu m ON s.product_id = m.product_id
+GROUP BY s.customer_id, m.product_name
+HAVING COUNT(s.product_id) = (
+    SELECT MAX(product_count)
+    FROM (
+        SELECT COUNT(product_id) AS product_count
+        FROM sales s2
+        WHERE s2.customer_id = s.customer_id
+        GROUP BY s2.product_id
+    ) max_counts
+)
+ORDER BY s.customer_id;
+
+--- Solución Claude (mas optimizada / menos tiempo en correr)
+SELECT 
+    s.customer_id,
+    m.product_name,
+    COUNT(s.product_id) AS num_productos
+FROM sales s
+JOIN menu m ON s.product_id = m.product_id
+GROUP BY s.customer_id, m.product_name
+HAVING COUNT(s.product_id) >= ALL (
+    SELECT COUNT(product_id)
+    FROM sales s2
+    WHERE s2.customer_id = s.customer_id
+    GROUP BY s2.product_id
+)
+ORDER BY s.customer_id;
+
+```
+
+### --- 6. Which item was purchased first by the customer after they became a member?
+``` PostgreSQL
+
+SELECT DISTINCT
+    s.customer_id,
+    m.product_name
+FROM sales s
+JOIN menu m ON s.product_id = m.product_id
+JOIN members mb ON s.customer_id = mb.customer_id
+WHERE s.order_date >= mb.join_date
+AND s.order_date = (
+    SELECT MIN(s2.order_date)
+    FROM sales s2
+    JOIN members mb2 ON s2.customer_id = mb2.customer_id
+    WHERE s2.customer_id = s.customer_id
+    AND s2.order_date >= mb2.join_date
+);
+
+--- Solución Claude (más rapida)
+SELECT DISTINCT
+    customer_id,
+    product_name
+FROM (
+    SELECT 
+        s.customer_id,
+        m.product_name,
+        ROW_NUMBER() OVER (PARTITION BY s.customer_id ORDER BY s.order_date) as rn
+    FROM sales s
+    JOIN menu m ON s.product_id = m.product_id
+    JOIN members mb ON s.customer_id = mb.customer_id
+    WHERE s.order_date >= mb.join_date
+) ranked
+WHERE rn = 1;
+
+
+```
+
+
+### --- 7. Which item was purchased just before the customer became a member?
+``` PostgreSQL
+
+SELECT s.customer_id, m.product_name
+FROM sales s
+JOIN menu m ON s.product_id = m.product_id
+JOIN members mb ON s.customer_id = mb.customer_id
+WHERE s.order_date < mb.join_date
+AND s.order_date = (
+    SELECT MAX(s2.order_date)
+    FROM sales s2
+    JOIN members mb2 ON s2.customer_id = mb2.customer_id
+    WHERE s2.customer_id = s.customer_id
+    AND s2.order_date < mb2.join_date
+)
+ORDER BY s.customer_id, m.product_name;
+
+
+```
+
+
+### --- 8. What is the total items and amount spent for each member before they became a member?
+``` PostgreSQL
+SELECT
+	s.customer_id,
+    COUNT(s.product_id) AS total_items,
+    SUM(m.price) AS total_spent
+FROM sales s
+JOIN members mb ON s.customer_id = mb.customer_id
+JOIN menu m ON s.product_id = m.product_id
+WHERE s.order_date < mb.join_date
+GROUP BY s.customer_id
+;
+```
+
+
+### --- 9.  If each $1 spent equates to 10 points and sushi has a 2x points multiplier - how many points would each customer have?
+``` PostgreSQL
+
+SELECT
+    s.customer_id,
+    SUM(CASE
+        WHEN s.product_id = 1 THEN m.price * 10 * 2  -- sushi: 2x multiplier
+        ELSE m.price * 10                            -- curry & ramen: normal points
+    END) AS total_points
+FROM sales s
+JOIN menu m ON s.product_id = m.product_id
+GROUP BY s.customer_id
+ORDER BY s.customer_id;
+
+-- for members only	
+SELECT
+    s.customer_id,
+    SUM(CASE
+        WHEN s.product_id = 1 THEN m.price * 10 * 2  -- sushi: 2x multiplier
+        ELSE m.price * 10                            -- curry & ramen: normal points
+    END) AS total_points
+FROM sales s
+JOIN menu m ON s.product_id = m.product_id
+JOIN members mb ON s.customer_id = mb.customer_id  -- Only members
+GROUP BY s.customer_id
+ORDER BY s.customer_id;
+
+```
+
+### --- 10. In the first week after a customer joins the program (including their join date) they earn 2x points on all items, not just sushi - how many points do customer A and B have at the end of January?
+``` PostgreSQL
+
+SELECT
+    s.customer_id,
+    SUM(CASE
+        WHEN s.order_date >= mb.join_date 
+        AND s.order_date <= (mb.join_date + INTERVAL '6 days') THEN m.price * 10 * 2  
+        WHEN s.product_id = 1 THEN m.price * 10 * 2  -- sushi 2x multiplier
+        ELSE m.price * 10
+    END) AS total_points
+FROM sales s
+JOIN menu m ON s.product_id = m.product_id
+JOIN members mb ON s.customer_id = mb.customer_id
+WHERE s.order_date <= '2021-01-31'  -- Only purchases through end of January
+GROUP BY s.customer_id
+ORDER BY s.customer_id;
+```
+
+
+### Bonus questions:
+
+Create tables to quickly derive insights without needing to join the underlying tables:
+- customer_id, order_date, product_name, price, member
+``` PostgreSQL
+
+SELECT 
+    s.customer_id,
+    s.order_date,
+    m.product_name,
+    m.price,
+    CASE 
+        WHEN mb.customer_id IS NOT NULL AND s.order_date >= mb.join_date THEN 'Y'
+        ELSE 'N'
+    END AS member
+FROM sales s
+JOIN menu m ON s.product_id = m.product_id
+LEFT JOIN members mb ON s.customer_id = mb.customer_id
+ORDER BY s.customer_id, s.order_date;
+
+```
+
+- ranking de productos por cliente (solo miembros).
+Pregunta: "### Rank All The Things
+Danny also requires further information about the `ranking` of customer products, but he purposely does not need the ranking for non-member purchases so he expects null `ranking` values for the records when customers are not yet part of the loyalty program."
+ Columnas: customer_id, order_date, product_name, price, member, ranking
+
+``` PostgreSQL
+
+SELECT 
+    s.customer_id,
+    s.order_date,
+    m.product_name,
+    m.price,
+    CASE 
+        WHEN mb.customer_id IS NOT NULL AND s.order_date >= mb.join_date THEN 'Y'
+        ELSE 'N'
+    END AS member,
+    CASE 
+        WHEN mb.customer_id IS NOT NULL AND s.order_date >= mb.join_date THEN
+            RANK() OVER (PARTITION BY s.customer_id ORDER BY s.order_date)
+        ELSE NULL
+    END AS ranking
+FROM sales s
+JOIN menu m ON s.product_id = m.product_id
+LEFT JOIN members mb ON s.customer_id = mb.customer_id
+ORDER BY s.customer_id, s.order_date;
+
+
+---V2
+-- Non-member purchases should have NULL ranking values. La clave (para hacer que el ranking empiece desde el primer producto como miembro) esta en el CASE WHEN dentro de PARTITION BY (es 1 solo si mb.join_date >= s.order_date)
+
+SELECT 
+    s.customer_id,
+    s.order_date,
+    m.product_name,
+    m.price,
+    CASE 
+        WHEN mb.customer_id IS NOT NULL AND s.order_date >= mb.join_date THEN 'Y'
+        ELSE 'N'
+    END AS member,
+    CASE 
+        WHEN mb.customer_id IS NOT NULL AND s.order_date >= mb.join_date THEN
+            RANK() OVER (
+                PARTITION BY s.customer_id, 
+                CASE WHEN mb.customer_id IS NOT NULL AND s.order_date >= mb.join_date THEN 1 ELSE 0 END 
+                ORDER BY s.order_date
+            )
+        ELSE NULL
+    END AS ranking
+FROM sales s
+JOIN menu m ON s.product_id = m.product_id
+LEFT JOIN members mb ON s.customer_id = mb.customer_id
+ORDER BY s.customer_id, s.order_date;
+
+```
